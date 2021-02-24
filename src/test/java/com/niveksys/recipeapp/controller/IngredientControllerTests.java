@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.util.HashSet;
-
 import com.niveksys.recipeapp.command.IngredientCommand;
 import com.niveksys.recipeapp.command.RecipeCommand;
 import com.niveksys.recipeapp.command.UnitOfMeasureCommand;
@@ -27,6 +25,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import reactor.core.publisher.Flux;
 
 @WebMvcTest(IngredientController.class)
 public class IngredientControllerTests {
@@ -69,7 +69,7 @@ public class IngredientControllerTests {
 
         // when
         when(this.recipeService.findCommandById(anyString())).thenReturn(command);
-        when(this.unitOfMeasureService.getUomCommands()).thenReturn(new HashSet<>());
+        when(this.unitOfMeasureService.getUomCommands()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
 
         // then
         mockMvc.perform(get("/recipes/1/ingredients/new")).andExpect(status().isOk())
@@ -119,7 +119,7 @@ public class IngredientControllerTests {
 
         // when
         when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(command);
-        when(unitOfMeasureService.getUomCommands()).thenReturn(new HashSet<>());
+        when(unitOfMeasureService.getUomCommands()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
 
         // then
         mockMvc.perform(get("/recipes/1/ingredients/2/edit")).andExpect(status().isOk())

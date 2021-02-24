@@ -1,9 +1,9 @@
 package com.niveksys.recipeapp.service;
 
-import java.util.Set;
-
 import com.niveksys.recipeapp.command.UnitOfMeasureCommand;
 
+import reactor.core.publisher.Flux;
+
 public interface UnitOfMeasureService {
-    Set<UnitOfMeasureCommand> getUomCommands();
+    Flux<UnitOfMeasureCommand> getUomCommands();
 }
