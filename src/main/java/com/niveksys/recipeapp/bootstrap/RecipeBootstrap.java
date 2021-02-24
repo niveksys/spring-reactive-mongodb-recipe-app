@@ -14,9 +14,7 @@ import com.niveksys.recipeapp.model.UnitOfMeasure;
 import com.niveksys.recipeapp.repository.CategoryRepository;
 import com.niveksys.recipeapp.repository.RecipeRepository;
 import com.niveksys.recipeapp.repository.UnitOfMeasureRepository;
-import com.niveksys.recipeapp.repository.reactive.UnitOfMeasureReactiveRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -30,9 +28,6 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
-
-    @Autowired
-    UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
 
     public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository,
             UnitOfMeasureRepository unitOfMeasureRepository) {
@@ -48,7 +43,6 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         this.loadCategories();
         this.loadUom();
         this.recipeRepository.saveAll(this.getRecipes());
-        log.debug("Count: " + this.unitOfMeasureReactiveRepository.count().block().toString());
     }
 
     private void loadCategories() {
