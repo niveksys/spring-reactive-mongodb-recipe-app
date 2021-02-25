@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @WebMvcTest(IngredientController.class)
 public class IngredientControllerTests {
@@ -87,7 +88,7 @@ public class IngredientControllerTests {
         command.setRecipeId("2");
 
         // when
-        when(ingredientService.saveIngredientCommand(any())).thenReturn(command);
+        when(ingredientService.saveIngredientCommand(any())).thenReturn(Mono.just(command));
 
         // then
         mockMvc.perform(post("/recipes/2/ingredients").contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -101,7 +102,8 @@ public class IngredientControllerTests {
         IngredientCommand command = new IngredientCommand();
         UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
         command.setUom(uomCommand);
-        when(this.ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(command);
+        when(this.ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString()))
+                .thenReturn(Mono.just(command));
 
         // when
         this.mockMvc.perform(get("/recipes/1/ingredients/2")).andExpect(status().isOk())
@@ -118,7 +120,7 @@ public class IngredientControllerTests {
         IngredientCommand command = new IngredientCommand();
 
         // when
-        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(command);
+        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(command));
         when(unitOfMeasureService.getUomCommands()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
 
         // then
@@ -129,6 +131,8 @@ public class IngredientControllerTests {
 
     @Test
     public void delete() throws Exception {
+        // given
+        when(this.ingredientService.deleteById(anyString(), anyString())).thenReturn(Mono.empty());
 
         // then
         mockMvc.perform(get("/recipes/2/ingredients/3/delete")).andExpect(status().is3xxRedirection())

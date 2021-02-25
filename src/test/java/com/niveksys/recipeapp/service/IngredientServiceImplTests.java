@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import com.niveksys.recipeapp.command.IngredientCommand;
+import com.niveksys.recipeapp.command.UnitOfMeasureCommand;
 import com.niveksys.recipeapp.converter.IngredientCommandToIngredient;
 import com.niveksys.recipeapp.converter.IngredientToIngredientCommand;
 import com.niveksys.recipeapp.converter.UnitOfMeasureCommandToUnitOfMeasure;
@@ -18,12 +19,16 @@ import com.niveksys.recipeapp.model.Ingredient;
 import com.niveksys.recipeapp.model.Recipe;
 import com.niveksys.recipeapp.repository.RecipeRepository;
 import com.niveksys.recipeapp.repository.UnitOfMeasureRepository;
+import com.niveksys.recipeapp.repository.reactive.RecipeReactiveRepository;
+import com.niveksys.recipeapp.repository.reactive.UnitOfMeasureReactiveRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 public class IngredientServiceImplTests {
@@ -32,7 +37,10 @@ public class IngredientServiceImplTests {
     RecipeRepository recipeRepository;
 
     @Mock
-    UnitOfMeasureRepository unitOfMeasureRepository;
+    RecipeReactiveRepository recipeReactiveRepository;
+
+    @Mock
+    UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
 
     IngredientToIngredientCommand ingredientToIngredientCommand;
     IngredientCommandToIngredient ingredientCommandToIngredient;
@@ -47,8 +55,9 @@ public class IngredientServiceImplTests {
 
     @BeforeEach
     public void setUp() {
-        this.ingredientService = new IngredientServiceImpl(this.recipeRepository, this.unitOfMeasureRepository,
-                this.ingredientToIngredientCommand, this.ingredientCommandToIngredient);
+        this.ingredientService = new IngredientServiceImpl(this.recipeRepository, this.recipeReactiveRepository,
+                this.unitOfMeasureReactiveRepository, this.ingredientToIngredientCommand,
+                this.ingredientCommandToIngredient);
     }
 
     @Test
@@ -69,16 +78,15 @@ public class IngredientServiceImplTests {
         recipe.addIngredient(ingredient1);
         recipe.addIngredient(ingredient2);
         recipe.addIngredient(ingredient3);
-        Optional<Recipe> recipeOptional = Optional.of(recipe);
 
-        when(this.recipeRepository.findById(anyString())).thenReturn(recipeOptional);
+        when(this.recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
 
         // nwhen
-        IngredientCommand returnCommand = this.ingredientService.findByRecipeIdAndIngredientId("1", "3");
+        IngredientCommand returnCommand = this.ingredientService.findByRecipeIdAndIngredientId("1", "3").block();
 
         // the
         assertEquals("3", returnCommand.getId());
-        verify(this.recipeRepository, times(1)).findById(anyString());
+        verify(this.recipeReactiveRepository, times(1)).findById(anyString());
     }
 
     @Test
@@ -87,6 +95,8 @@ public class IngredientServiceImplTests {
         IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setId("3");
         ingredientCommand.setRecipeId("2");
+        ingredientCommand.setUom(new UnitOfMeasureCommand());
+        ingredientCommand.getUom().setId("1234");
 
         Optional<Recipe> recipeOptional = Optional.of(new Recipe());
 
@@ -95,15 +105,15 @@ public class IngredientServiceImplTests {
         savedRecipe.getIngredients().iterator().next().setId("3");
 
         when(this.recipeRepository.findById(anyString())).thenReturn(recipeOptional);
-        when(this.recipeRepository.save(any())).thenReturn(savedRecipe);
+        when(this.recipeReactiveRepository.save(any())).thenReturn(Mono.just(savedRecipe));
 
         // when
-        IngredientCommand savedCommand = this.ingredientService.saveIngredientCommand(ingredientCommand);
+        IngredientCommand savedCommand = this.ingredientService.saveIngredientCommand(ingredientCommand).block();
 
         // then
         assertEquals("3", savedCommand.getId());
         verify(this.recipeRepository, times(1)).findById(anyString());
-        verify(this.recipeRepository, times(1)).save(any(Recipe.class));
+        verify(this.recipeReactiveRepository, times(1)).save(any(Recipe.class));
     }
 
     @Test
