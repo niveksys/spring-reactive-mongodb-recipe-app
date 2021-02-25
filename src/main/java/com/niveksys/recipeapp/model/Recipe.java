@@ -22,18 +22,11 @@ public class Recipe {
     private Integer servings;
     private String source;
     private String url;
-
     private String directions;
-
     private Set<Ingredient> ingredients = new HashSet<>();
-
     private Byte[] image;
-
     private Difficulty difficulty;
-
     private Notes notes;
-
-    @DBRef
     private Set<Category> categories = new HashSet<>();
 
     public void setNotes(Notes notes) {

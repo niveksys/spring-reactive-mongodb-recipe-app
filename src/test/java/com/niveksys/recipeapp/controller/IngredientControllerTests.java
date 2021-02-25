@@ -65,12 +65,12 @@ public class IngredientControllerTests {
     @Test
     public void newIngredient() throws Exception {
         // given
-        RecipeCommand command = new RecipeCommand();
-        command.setId("1");
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId("1");
 
         // when
-        when(this.recipeService.findCommandById(anyString())).thenReturn(command);
-        when(this.unitOfMeasureService.getUomCommands()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
+        when(this.recipeService.findCommandById(anyString())).thenReturn(recipeCommand);
+        when(this.unitOfMeasureService.getUomCommands()).thenReturn(Flux.empty());
 
         // then
         mockMvc.perform(get("/recipes/1/ingredients/new")).andExpect(status().isOk())
@@ -119,9 +119,12 @@ public class IngredientControllerTests {
         // given
         IngredientCommand command = new IngredientCommand();
 
+        // UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
+        // uomCommand.setId("1");
+
         // when
         when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(command));
-        when(unitOfMeasureService.getUomCommands()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
+        when(unitOfMeasureService.getUomCommands()).thenReturn(Flux.empty());
 
         // then
         mockMvc.perform(get("/recipes/1/ingredients/2/edit")).andExpect(status().isOk())
