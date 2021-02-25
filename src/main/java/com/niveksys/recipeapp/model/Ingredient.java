@@ -3,8 +3,6 @@ package com.niveksys.recipeapp.model;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
 import lombok.Data;
 
 @Data
