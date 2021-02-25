@@ -18,7 +18,6 @@ import com.niveksys.recipeapp.converter.UnitOfMeasureToUnitOfMeasureCommand;
 import com.niveksys.recipeapp.model.Ingredient;
 import com.niveksys.recipeapp.model.Recipe;
 import com.niveksys.recipeapp.repository.RecipeRepository;
-import com.niveksys.recipeapp.repository.UnitOfMeasureRepository;
 import com.niveksys.recipeapp.repository.reactive.RecipeReactiveRepository;
 import com.niveksys.recipeapp.repository.reactive.UnitOfMeasureReactiveRepository;
 

@@ -58,11 +58,10 @@ public class IngredientServiceImpl implements IngredientService {
         // log.error("Ingredient not found with ID: " + ingredientId);
         // }
         // return Mono.just(commandOptional.get());
-        return this.recipeReactiveRepository.findById(recipeId)
-                .map(recipe -> recipe.getIngredients().stream()
-                        .filter(ingredient -> ingredient.getId().equalsIgnoreCase(ingredientId)).findFirst())
-                .filter(Optional::isPresent).map(ingredient -> {
-                    IngredientCommand command = this.ingredientToIngredientCommand.convert(ingredient.get());
+
+        return this.recipeReactiveRepository.findById(recipeId).flatMapIterable(Recipe::getIngredients)
+                .filter(ingredient -> ingredient.getId().equalsIgnoreCase(ingredientId)).single().map(ingredient -> {
+                    IngredientCommand command = this.ingredientToIngredientCommand.convert(ingredient);
                     command.setRecipeId(recipeId);
                     return command;
                 });
