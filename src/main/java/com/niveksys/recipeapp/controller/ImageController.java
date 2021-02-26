@@ -43,7 +43,7 @@ public class ImageController {
     @PostMapping("/recipes/{id}/image")
     public String createOrUpdate(@PathVariable String id, @RequestParam("imageFile") MultipartFile file) {
         log.debug("CREATE a new image, or UPDATE a specific image, then redirect to SHOW.");
-        this.imageService.saveImageFile(id, file);
+        this.imageService.saveImageFile(id, file).block();
         return "redirect:/recipes/" + id;
     }
 
