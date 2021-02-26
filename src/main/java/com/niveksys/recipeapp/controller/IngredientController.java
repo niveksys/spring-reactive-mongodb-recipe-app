@@ -9,7 +9,10 @@ import com.niveksys.recipeapp.service.UnitOfMeasureService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +27,18 @@ public class IngredientController {
     private final IngredientService ingredientService;
     private final UnitOfMeasureService unitOfMeasureService;
 
+    private WebDataBinder webDataBinder;
+
     public IngredientController(RecipeService recipeService, IngredientService ingredientService,
             UnitOfMeasureService unitOfMeasureService) {
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
         this.unitOfMeasureService = unitOfMeasureService;
+    }
+
+    @InitBinder("ingredient")
+    public void initBinder(WebDataBinder webDataBinder) {
+        this.webDataBinder = webDataBinder;
     }
 
     @GetMapping("/recipes/{recipeId}/ingredients")
@@ -54,8 +64,19 @@ public class IngredientController {
     }
 
     @PostMapping("/recipes/{recipeId}/ingredients")
-    public String createOrUpdate(@ModelAttribute IngredientCommand command) {
+    public String createOrUpdate(@ModelAttribute("ingredient") IngredientCommand command, Model model) {
         log.debug("CREATE a new ingredient, or UPDATE a specific ingredient, then redirect to SHOW.");
+
+        webDataBinder.validate();
+        BindingResult bindingResult = webDataBinder.getBindingResult();
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(objectError -> {
+                log.debug(objectError.toString());
+            });
+            model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
+            return "recipes/ingredients/edit";
+        }
+
         IngredientCommand savedCommand = this.ingredientService.saveIngredientCommand(command).block();
 
         log.debug("Saved Receipe ID:" + savedCommand.getRecipeId());
