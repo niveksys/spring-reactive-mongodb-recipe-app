@@ -30,6 +30,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @WebMvcTest(RecipeController.class)
 public class RecipeControllerTests {
     @MockBean
@@ -57,7 +60,7 @@ public class RecipeControllerTests {
         recipes.add(recipe2);
 
         // when
-        when(this.recipeService.getRecipes()).thenReturn(recipes);
+        when(this.recipeService.getRecipes()).thenReturn(Flux.fromIterable(recipes));
 
         // then
         mockMvc.perform(get("/recipes")).andExpect(status().isOk()).andExpect(view().name("recipes/list"))
@@ -77,7 +80,7 @@ public class RecipeControllerTests {
         command.setId("2");
 
         // when
-        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+        when(recipeService.saveRecipeCommand(any())).thenReturn(Mono.just(command));
 
         // then
         mockMvc.perform(post("/recipes").contentType(MediaType.APPLICATION_FORM_URLENCODED).param("id", "")
@@ -92,7 +95,7 @@ public class RecipeControllerTests {
         command.setId("2");
 
         // when
-        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+        when(recipeService.saveRecipeCommand(any())).thenReturn(Mono.just(command));
 
         // then
         mockMvc.perform(post("/recipes").contentType(MediaType.APPLICATION_FORM_URLENCODED).param("id", "")
@@ -110,7 +113,7 @@ public class RecipeControllerTests {
         recipe.setNotes(notes);
 
         // when
-        when(this.recipeService.findById(anyString())).thenReturn(recipe);
+        when(this.recipeService.findById(anyString())).thenReturn(Mono.just(recipe));
 
         // then
         this.mockMvc.perform(get("/recipes/1")).andExpect(status().isOk()).andExpect(view().name("recipes/show"))
@@ -133,7 +136,7 @@ public class RecipeControllerTests {
         command.setId("2");
 
         // when
-        when(this.recipeService.findCommandById(anyString())).thenReturn(command);
+        when(this.recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         // then
         mockMvc.perform(get("/recipes/2/edit")).andExpect(status().isOk()).andExpect(view().name("recipes/edit"))
@@ -142,9 +145,12 @@ public class RecipeControllerTests {
 
     @Test
     public void delete() throws Exception {
+        // given
+        when(this.recipeService.deleteById(anyString())).thenReturn(Mono.empty());
+
         // when & then
         mockMvc.perform(get("/recipes/1/delete")).andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipes"));
-        verify(recipeService, times(1)).deleteById(anyString());
+        verify(this.recipeService, times(1)).deleteById(anyString());
     }
 }

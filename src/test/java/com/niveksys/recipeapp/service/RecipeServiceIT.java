@@ -8,15 +8,12 @@ import com.niveksys.recipeapp.converter.RecipeToRecipeCommand;
 import com.niveksys.recipeapp.model.Recipe;
 import com.niveksys.recipeapp.repository.RecipeRepository;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-@Disabled
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class RecipeServiceIT {
@@ -35,7 +32,6 @@ public class RecipeServiceIT {
     @Autowired
     RecipeToRecipeCommand recipeToRecipeCommand;
 
-    @Transactional
     @Test
     public void saveRecipeCommand() throws Exception {
         // given
@@ -45,7 +41,7 @@ public class RecipeServiceIT {
 
         // when
         command.setDescription(NEW_DESCRIPTION);
-        RecipeCommand savedCommand = this.recipeService.saveRecipeCommand(command);
+        RecipeCommand savedCommand = this.recipeService.saveRecipeCommand(command).block();
 
         // then
         assertEquals(NEW_DESCRIPTION, savedCommand.getDescription());

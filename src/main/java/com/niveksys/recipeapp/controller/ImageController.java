@@ -36,7 +36,7 @@ public class ImageController {
     @GetMapping("/recipes/{id}/image/new")
     public String newImage(@PathVariable String id, Model model) {
         log.debug("NEW image form.");
-        model.addAttribute("recipe", this.recipeService.findCommandById(id));
+        model.addAttribute("recipe", this.recipeService.findCommandById(id).block());
         return "recipes/imageForm";
     }
 
@@ -49,7 +49,7 @@ public class ImageController {
 
     @GetMapping("/recipes/{id}/image")
     public void show(@PathVariable String id, HttpServletResponse response) throws IOException {
-        RecipeCommand command = this.recipeService.findCommandById(id);
+        RecipeCommand command = this.recipeService.findCommandById(id).block();
 
         if (command.getImage() != null) {
             byte[] bytes = new byte[command.getImage().length];

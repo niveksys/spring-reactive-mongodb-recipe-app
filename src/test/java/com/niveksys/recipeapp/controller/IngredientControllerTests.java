@@ -52,7 +52,7 @@ public class IngredientControllerTests {
     public void list() throws Exception {
         // given
         RecipeCommand command = new RecipeCommand();
-        when(this.recipeService.findCommandById(anyString())).thenReturn(command);
+        when(this.recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         // when
         this.mockMvc.perform(get("/recipes/1/ingredients")).andExpect(status().isOk())
@@ -69,7 +69,7 @@ public class IngredientControllerTests {
         recipeCommand.setId("1");
 
         // when
-        when(this.recipeService.findCommandById(anyString())).thenReturn(recipeCommand);
+        when(this.recipeService.findCommandById(anyString())).thenReturn(Mono.just(recipeCommand));
         when(this.unitOfMeasureService.getUomCommands()).thenReturn(Flux.empty());
 
         // then

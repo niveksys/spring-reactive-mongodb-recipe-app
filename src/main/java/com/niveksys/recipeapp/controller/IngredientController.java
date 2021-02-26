@@ -34,7 +34,7 @@ public class IngredientController {
     @GetMapping("/recipes/{recipeId}/ingredients")
     public String list(@PathVariable String recipeId, Model model) {
         log.debug("LIST all ingredients.");
-        model.addAttribute("recipe", this.recipeService.findCommandById(recipeId));
+        model.addAttribute("recipe", this.recipeService.findCommandById(recipeId).block());
         return "recipes/ingredients/list";
     }
 
@@ -42,7 +42,7 @@ public class IngredientController {
     public String newIngredient(@PathVariable String recipeId, Model model) {
         log.debug("NEW ingredient form.");
 
-        RecipeCommand recipeCommand = this.recipeService.findCommandById(recipeId);
+        RecipeCommand recipeCommand = this.recipeService.findCommandById(recipeId).block();
 
         IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setRecipeId(recipeCommand.getId());

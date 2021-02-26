@@ -25,6 +25,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import reactor.core.publisher.Mono;
+
 @WebMvcTest(ImageController.class)
 public class ImageControllerTests {
     @MockBean
@@ -46,7 +48,7 @@ public class ImageControllerTests {
         RecipeCommand command = new RecipeCommand();
         command.setId("1");
 
-        when(recipeService.findCommandById(anyString())).thenReturn(command);
+        when(recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         // when
         this.mockMvc.perform(get("/recipes/1/image/new")).andExpect(status().isOk())
@@ -86,7 +88,7 @@ public class ImageControllerTests {
         }
         command.setImage(bytes);
 
-        when(this.recipeService.findCommandById(anyString())).thenReturn(command);
+        when(this.recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         // when
         MockHttpServletResponse response = this.mockMvc.perform(get("/recipes/1/image")).andExpect(status().isOk())

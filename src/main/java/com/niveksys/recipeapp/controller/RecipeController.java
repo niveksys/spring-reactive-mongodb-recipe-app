@@ -37,7 +37,7 @@ public class RecipeController {
     @GetMapping({ "", "/" })
     public String list(Model model) {
         log.debug("LIST all recipes.");
-        model.addAttribute("recipes", this.recipeService.getRecipes());
+        model.addAttribute("recipes", this.recipeService.getRecipes().collectList().block());
         return "recipes/list";
     }
 
@@ -57,28 +57,28 @@ public class RecipeController {
             });
             return RECIPE_CREATE_OR_UPDATE_VIEW;
         }
-        RecipeCommand savedCommand = this.recipeService.saveRecipeCommand(command);
+        RecipeCommand savedCommand = this.recipeService.saveRecipeCommand(command).block();
         return "redirect:/recipes/" + savedCommand.getId();
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable String id, Model model) {
         log.debug("SHOW info about a specific recipe.");
-        model.addAttribute("recipe", this.recipeService.findById(id));
+        model.addAttribute("recipe", this.recipeService.findById(id).block());
         return "recipes/show";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable String id, Model model) {
         log.debug("EDIT form for a specific recipe.");
-        model.addAttribute("recipe", this.recipeService.findCommandById(id));
+        model.addAttribute("recipe", this.recipeService.findCommandById(id).block());
         return RECIPE_CREATE_OR_UPDATE_VIEW;
     }
 
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         log.debug("DELETE a specific recipe, then redirect to LIST.");
-        this.recipeService.deleteById(id);
+        this.recipeService.deleteById(id).block();
         return "redirect:/recipes";
     }
 
