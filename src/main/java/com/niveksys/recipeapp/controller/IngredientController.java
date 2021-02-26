@@ -34,7 +34,7 @@ public class IngredientController {
     @GetMapping("/recipes/{recipeId}/ingredients")
     public String list(@PathVariable String recipeId, Model model) {
         log.debug("LIST all ingredients.");
-        model.addAttribute("recipe", this.recipeService.findCommandById(recipeId).block());
+        model.addAttribute("recipe", this.recipeService.findCommandById(recipeId));
         return "recipes/ingredients/list";
     }
 
@@ -49,7 +49,7 @@ public class IngredientController {
         ingredientCommand.setUom(new UnitOfMeasureCommand());
 
         model.addAttribute("ingredient", ingredientCommand);
-        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands().collectList().block());
+        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
         return "recipes/ingredients/edit";
     }
 
@@ -67,15 +67,15 @@ public class IngredientController {
     @GetMapping("/recipes/{recipeId}/ingredients/{id}")
     public String show(@PathVariable String recipeId, @PathVariable String id, Model model) {
         log.debug("SHOW info about a specific recipe.");
-        model.addAttribute("ingredient", this.ingredientService.findByRecipeIdAndIngredientId(recipeId, id).block());
+        model.addAttribute("ingredient", this.ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
         return "recipes/ingredients/show";
     }
 
     @GetMapping("/recipes/{recipeId}/ingredients/{id}/edit")
     public String edit(@PathVariable String recipeId, @PathVariable String id, Model model) {
         log.debug("EDIT form for a specific ingredient.");
-        model.addAttribute("ingredient", this.ingredientService.findByRecipeIdAndIngredientId(recipeId, id).block());
-        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands().collectList().block());
+        model.addAttribute("ingredient", this.ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
+        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
         return "recipes/ingredients/edit";
     }
 
