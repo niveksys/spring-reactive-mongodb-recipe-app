@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Controller
@@ -41,6 +42,11 @@ public class IngredientController {
         this.webDataBinder = webDataBinder;
     }
 
+    @ModelAttribute("uoms")
+    public Flux<UnitOfMeasureCommand> populateUoms() {
+        return this.unitOfMeasureService.getUomCommands();
+    }
+
     @GetMapping("/recipes/{recipeId}/ingredients")
     public String list(@PathVariable String recipeId, Model model) {
         log.debug("LIST all ingredients.");
@@ -59,7 +65,6 @@ public class IngredientController {
         ingredientCommand.setUom(new UnitOfMeasureCommand());
 
         model.addAttribute("ingredient", ingredientCommand);
-        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
         return "recipes/ingredients/edit";
     }
 
@@ -73,7 +78,6 @@ public class IngredientController {
             bindingResult.getAllErrors().forEach(objectError -> {
                 log.debug(objectError.toString());
             });
-            model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
             return "recipes/ingredients/edit";
         }
 
@@ -96,7 +100,6 @@ public class IngredientController {
     public String edit(@PathVariable String recipeId, @PathVariable String id, Model model) {
         log.debug("EDIT form for a specific ingredient.");
         model.addAttribute("ingredient", this.ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
-        model.addAttribute("uoms", this.unitOfMeasureService.getUomCommands());
         return "recipes/ingredients/edit";
     }
 
